@@ -1,11 +1,12 @@
 """Stripped version of https://github.com/richzhang/PerceptualSimilarity/tree/master/models"""
-
+import os
 import torch
 import torch.nn as nn
 from torchvision import models
 from collections import namedtuple
 
 from taming.util import get_ckpt_path
+from DLproj import _GLOBAL_VARS
 
 
 class LPIPS(nn.Module):
@@ -25,7 +26,8 @@ class LPIPS(nn.Module):
             param.requires_grad = False
 
     def load_from_pretrained(self, name="vgg_lpips"):
-        ckpt = get_ckpt_path(name, "taming/modules/autoencoder/lpips")
+        ckpt_root = os.path.join(_GLOBAL_VARS["taming-transformers"], "taming/modules/autoencoder/lpips")
+        ckpt = get_ckpt_path(name, root=ckpt_root)
         self.load_state_dict(torch.load(ckpt, map_location=torch.device("cpu")), strict=False)
         print("loaded pretrained LPIPS loss from {}".format(ckpt))
 
