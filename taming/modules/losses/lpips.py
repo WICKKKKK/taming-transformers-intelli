@@ -7,6 +7,7 @@ from collections import namedtuple
 
 from taming.util import get_ckpt_path
 from DLproj import _GLOBAL_VARS
+from DLproj.archs.misc import load_model_from_url
 
 
 class LPIPS(nn.Module):
@@ -76,9 +77,14 @@ class NetLinLayer(nn.Module):
 
 
 class vgg16(torch.nn.Module):
-    def __init__(self, requires_grad=False, pretrained=True):
+    def __init__(self, requires_grad=False, pretrained=True, model_path=_GLOBAL_VARS['pretrained_models']):
         super(vgg16, self).__init__()
-        vgg_pretrained_features = models.vgg16(pretrained=pretrained).features
+        vgg = models.vgg16(pretrained=False, progress=True)
+        if pretrained:
+            url = models.VGG16_Weights.IMAGENET1K_V1.url
+            state_dict = load_model_from_url(url, model_path=model_path, map_location=None, progress=True)
+            vgg.load_state_dict(state_dict)
+        vgg_pretrained_features = vgg.features
         self.slice1 = torch.nn.Sequential()
         self.slice2 = torch.nn.Sequential()
         self.slice3 = torch.nn.Sequential()
